@@ -1,0 +1,23 @@
+version: "3"
+services:
+  api:
+    build: .
+    environment:
+      - MONGO_URI=mongodb://mongo/simpleauth
+    ports:
+      - 4041:4041
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    depends_on:
+      - mongo
+    command: yarn dev:docker
+
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
+
+volumes:
+  node_modules:

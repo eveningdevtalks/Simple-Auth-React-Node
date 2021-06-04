@@ -1,0 +1,27 @@
+### Register
+POST http://localhost:4041/api/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "kasun@eveningdevtalks.com",
+    "name": "Kasun",
+    "password": "its-a-secret"
+}
+
+###
+
+### Login
+POST http://localhost:4041/api/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "kasun@eveningdevtalks.com",
+    "password": "its-a-secret"
+}
+###
+
+### Secret
+GET http://localhost:4041/api/starwars/quote HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer token
+###
