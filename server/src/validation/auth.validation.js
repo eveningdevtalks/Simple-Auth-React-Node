@@ -7,6 +7,11 @@ module.exports = {
       password: Joi.string().required(),
     }),
   },
+  loginToken: {
+    body: Joi.object({
+      token: Joi.string().required(),
+    }),
+  },
   register: {
     body: Joi.object({
       email: Joi.string().required(),

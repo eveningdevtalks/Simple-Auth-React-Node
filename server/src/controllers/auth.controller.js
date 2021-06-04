@@ -92,3 +92,45 @@ exports.login = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.loginToken = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+
+    const refreshToken = await RefreshToken.findOne({ token }).populate("user");
+    if (!refreshToken) {
+      return res
+        .status(httpStatus.UNAUTHORIZED)
+        .json({ message: "Unauthorized" });
+    }
+
+    const { user } = refreshToken;
+    const tokens = await generateTokens(user._id.toString());
+
+    return res
+      .status(httpStatus.OK)
+      .json({ ...tokens, user: { name: user.name } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.leaseToken = async (req, res, next) => {
+  try {
+    const { user } = req;
+
+    const refreshToken = await RefreshToken.findOne({ user: user._id });
+    if (!refreshToken) {
+      return res
+        .status(httpStatus.UNAUTHORIZED)
+        .json({ message: "Unauthorized" });
+    }
+
+    refreshToken.expiresAt = addDays(config.refreshTokenExpiresInDays);
+    await refreshToken.save();
+
+    return res.status(httpStatus.OK).json({ message: "Ok" });
+  } catch (error) {
+    next(error);
+  }
+};

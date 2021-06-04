@@ -7,7 +7,14 @@ const auth = require("../../middlewares/auth");
 
 router.post("/login", validate(validation.login), controller.login);
 
-router.post("/register", validate(validation.register), controller.register);
+router.post(
+  "/login/token",
+  validate(validation.loginToken),
+  controller.loginToken
+);
 
+router.post("/token/lease", auth(), controller.leaseToken);
+
+router.post("/register", validate(validation.register), controller.register);
 
 module.exports = router;

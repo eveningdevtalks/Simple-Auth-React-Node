@@ -7,7 +7,6 @@ Content-Type: application/json
     "name": "Kasun",
     "password": "its-a-secret"
 }
-
 ###
 
 ### Login
@@ -20,8 +19,23 @@ Content-Type: application/json
 }
 ###
 
+### Login with refresh token
+POST http://localhost:4041/api/auth/login/token HTTP/1.1
+Content-Type: application/json
+
+{
+    "token": "shhhhhhhhhhhhhhhhhh"
+}
+###
+
+### Lease refresh token lifetime
+POST http://localhost:4041/api/auth/token/lease HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer token
+###
+
 ### Secret
 GET http://localhost:4041/api/starwars/quote HTTP/1.1
 Content-Type: application/json
-Authori1zation: Bearer token
+Authorization: Bearer token
 ###
