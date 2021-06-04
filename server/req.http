@@ -23,5 +23,5 @@ Content-Type: application/json
 ### Secret
 GET http://localhost:4041/api/starwars/quote HTTP/1.1
 Content-Type: application/json
-Authorization: Bearer token
+Authori1zation: Bearer token
 ###

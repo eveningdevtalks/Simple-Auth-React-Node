@@ -7,7 +7,7 @@ const { ValidationError } = require('express-validation');
 exports.handleNotFound = (_req, res, _next) => {
   res.status(httpStatus.NOT_FOUND)
   res.json({
-    'error': 'Not found'
+    error: 'Not found'
   })
   res.end()
 }
@@ -19,8 +19,8 @@ exports.handleError = (err, _req, res, _next) => {
   if (err instanceof ValidationError) {
     return res.status(httpStatus.BAD_REQUEST)
       .json({
-        message: err.message,
-        errors: err.details,
+        error: err.message,
+        details: err.details,
       });
   }
 

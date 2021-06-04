@@ -1,9 +1,11 @@
 const httpStatus = require("http-status");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const config = require("../config");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
+const RefreshToken = require("../models/refreshToken.model");
 
 exports.register = async (req, res, next) => {
   try {
@@ -14,13 +16,53 @@ exports.register = async (req, res, next) => {
     const user = new User({ email, password: hashedPassword, name });
     await user.save();
 
-    return res
-      .status(httpStatus.CREATED)
-      .json({ message: 'Ok' });
+    return res.status(httpStatus.CREATED).json({ message: "Ok" });
   } catch (error) {
     next(error);
   }
 };
+
+function addDays(days) {
+  const now = new Date();
+  now.setDate(now.getDate() + days);
+  return now;
+}
+
+async function generateRefreshToken(userId) {
+  const refreshToken = await RefreshToken.findOne({ user: userId });
+
+  if (!refreshToken) {
+    const expiresAt = addDays(config.refreshTokenExpiresInDays);
+    const token = crypto.randomBytes(128).toString("hex");
+    const newToken = new RefreshToken({
+      token,
+      user: userId,
+      expiresAt,
+    });
+    await newToken.save();
+
+    return token;
+  }
+
+  refreshToken.expiresAt = addDays(config.refreshTokenExpiresInDays);
+  await refreshToken.save();
+
+  return refreshToken.token;
+}
+
+async function generateTokens(userId) {
+  const refreshToken = await generateRefreshToken(userId);
+
+  const jwtPayload = { _id: userId };
+  const accessToken = jwt.sign(jwtPayload, config.secret, {
+    expiresIn: config.tokenExpiresIn,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+  };
+}
 
 exports.login = async (req, res, next) => {
   try {
@@ -28,22 +70,24 @@ exports.login = async (req, res, next) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Email or Password invalid' });
+      return res
+        .status(httpStatus.UNAUTHORIZED)
+        .json({ message: "Email or Password invalid" });
     }
 
     const passwordOk = await bcrypt.compare(password, user.password);
 
     if (!passwordOk) {
-      return res.status(httpStatus.UNAUTHORIZED).json({ message: 'Email or Password invalid' });
+      return res
+        .status(httpStatus.UNAUTHORIZED)
+        .json({ message: "Email or Password invalid" });
     }
 
-    const jwtPayload = { _id: user._id.toString() };
+    const tokens = await generateTokens(user._id.toString());
 
-    const accessToken = jwt.sign(jwtPayload, config.secret, {
-      expiresIn: config.tokenExpiresIn,
-    });
-
-    return res.status(httpStatus.OK).json({ accessToken, user: { name: user.name } });
+    return res
+      .status(httpStatus.OK)
+      .json({ ...tokens, user: { name: user.name } });
   } catch (error) {
     next(error);
   }
