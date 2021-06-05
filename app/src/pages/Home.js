@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1)
   },
   secret: {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: theme.palette.divider,
     marginTop: theme.spacing(5),
     borderRadius: theme.spacing(1),
     minHeight: '10ch',
@@ -30,30 +30,32 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home({ user }) {
+export default function Home({ user, handleGetSecretData, secretData }) {
 
   const classes = useStyles();
-  const isLoggedIn = !!user.email;
+  const isLoggedIn = !!user;
   const [open, setOpen] = useState(false);
-  const [secret, setSecret] = useState("a");
 
-  const handleGetSecretData = () => {
-    console.log('Hello');
-    setOpen(true);
+  const handleSecret = () => {
+    if (isLoggedIn) {
+      handleGetSecretData();
+    } else {
+      setOpen(true);
+    }
   }
 
   return <div className={classes.container}>
-    <Typography className={classes.text} variant="h2">{isLoggedIn ? `Yo! Yo! Welcome ${user.name}` : 'You are still not logged dude!'}</Typography>
+    <Typography className={classes.text} variant="h2">{isLoggedIn ? `Yo! Yo! Welcome ${user}` : 'You are still not logged dude!'}</Typography>
     <div>
       {isLoggedIn && <img src={HomeImage} className={classes.hero} alt="home" />}
     </div>
-    <Button variant="contained" color="secondary" onClick={() => handleGetSecretData()} disabled={!!secret} className={classes.button}>Get Secret Data</Button>
+    <Button variant="contained" color="secondary" onClick={() => handleSecret()} className={classes.button}>Get Secret Data</Button>
     <Snackbar anchorOrigin={{
       vertical: 'bottom',
       horizontal: 'right',
     }} open={open} autoHideDuration={2000} message="You are not allowed mate!"></Snackbar>
-    <div className={classes.secret}>
-      <Typography variant="h5">Secret Code: {secret}</Typography>
-    </div>
+    {secretData && isLoggedIn && <div className={classes.secret}>
+      <Typography variant="h5">{secretData}</Typography>
+    </div>}
   </div>;
 }

@@ -6,8 +6,8 @@ export default function Auth({ children }) {
   const history = useHistory();
 
   useEffect(() => {
-    async function fetchUser() {
-      const token = await localStorage.getItem('token');
+    function fetchUser() {
+      const token = localStorage.getItem('token');
 
       if (token) {
         history.push('');
@@ -16,7 +16,6 @@ export default function Auth({ children }) {
 
     fetchUser();
   });
-
 
   return <>
     {children}

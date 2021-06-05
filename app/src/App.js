@@ -8,8 +8,9 @@ import SignInForm from './components/SignInForm';
 import SignUpForm from './components/SignUpForm';
 import Home from './pages/Home';
 import Auth from './pages/Auth';
+import apiClient from './apiClient';
 import {
-  BrowserRouter as Router, Switch, Route
+  BrowserRouter as Router, Switch, Route, useHistory
 } from "react-router-dom";
 
 const theme = createMuiTheme({
@@ -33,31 +34,137 @@ const useStyles = makeStyles(() => ({
 
 export default function App() {
 
-  const ACCESS_TOKEN = "";
-
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState("");
+  const [secretData, setSecretData] = useState("");
+  const [accessToken, setAccessToken] = useState("");
   const classes = useStyles();
+  const history = useHistory();
 
-  const handleUserSignIn = async (user) => {
-    setUser(user);
-    localStorage.setItem('token', JSON.stringify(user));
+  const handleUserSignIn = async (userData) => {
+
+    let isSuccess = false;
+
+    try {
+      const { data } = await apiClient.post('auth/login', {
+        ...userData
+      });
+
+      localStorage.setItem('token', data.refreshToken);
+
+      setUser(data.user.name);
+      setAccessToken(data.accessToken);
+
+      isSuccess = true;
+
+      history.push('/');
+
+    } catch {
+      isSuccess = false;
+    }
+
+    return isSuccess;
   };
 
   const handleSignOut = async () => {
-    setUser({});
-    localStorage.removeItem('token');
+    try {
+      await apiClient.post('auth/logout', {}, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      });
+
+      setUser("");
+
+      localStorage.removeItem('token');
+      setAccessToken("");
+      setSecretData("");
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+  const handleUserSignUp = async (userData) => {
+
+    let isSignUpSuccess = false;
+    let message = "";
+
+    try {
+      await apiClient.post('auth/register', {
+        ...userData
+      });
+
+      isSignUpSuccess = true;
+
+    } catch (err) {
+      const { response: { data: { message: errorMessage } } } = err;
+      isSignUpSuccess = false;
+      message = errorMessage
+    }
+
+    return { isSignUpSuccess, message };
+  }
+
+  const handleGetSecretData = async () => {
+
+    try {
+      const { data } = await apiClient.get('starwars/quote', {
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      });
+
+      setSecretData(data.message);
+    } catch (err) {
+      setSecretData("");
+    }
+  }
 
   useEffect(() => {
     async function fetchUser() {
+
       const token = localStorage.getItem('token');
 
-      if (token) {
-        setUser({ ...JSON.parse(token) });
-      }
+      setInterval(async () => {
+        if (token && accessToken) {
+          try {
+            await apiClient.post('auth/token/refresh', {}, {
+              headers: {
+                Authorization: 'Bearer ' + accessToken
+              }
+            });
+          } catch (err) {
+            localStorage.removeItem('token');
+            setAccessToken("");
+          }
+        }
+      }, 30 * 60 * 1000);
     }
 
     fetchUser();
+  }, [accessToken]);
+
+  useEffect(() => {
+
+    async function fetchToken() {
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        try {
+          const { data } = await apiClient.post('auth/login/token', {
+            token
+          });
+          localStorage.setItem('token', data.refreshToken);
+
+          setUser(data.user.name);
+          setAccessToken(data.accessToken);
+        } catch (err) {
+          setUser("");
+          setAccessToken("");
+        }
+      }
+    }
+
+    fetchToken();
   }, []);
 
   return (
@@ -74,11 +181,11 @@ export default function App() {
               </Route>
               <Route path="/signup">
                 <Auth>
-                  <SignUpForm />
+                  <SignUpForm handleUserSignUp={handleUserSignUp} />
                 </Auth>
               </Route>
               <Route path="/">
-                <Home user={user} />
+                <Home user={user} secretData={secretData} handleGetSecretData={handleGetSecretData} />
               </Route>
             </Switch>
           </div>

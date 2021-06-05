@@ -45,7 +45,7 @@ export default function MainAppBar({ user, signOut }) {
           </Typography>
           <div className={classes.grow} />
           <div>
-            {!!user.email ?
+            {!!user ?
               <Button className={classes.action} variant="outlined" onClick={handleSignOut}>SignOut</Button> :
               <>
                 <Button className={classes.action} variant="outlined" onClick={() => handleGoTo('signin')}>SignIn</Button>
