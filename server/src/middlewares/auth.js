@@ -10,6 +10,7 @@ module.exports = () => async (req, res, next) => {
     if (!authHeader) {
       return res.status(httpStatus.UNAUTHORIZED).json({ error: 'Unauthorized' }).end()
     }
+
     const [type, token] = authHeader.split(" ");
     if (type !== "Bearer" && !token) {
       return res.status(httpStatus.UNAUTHORIZED).json({ error: 'Unauthorized' }).end()

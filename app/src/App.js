@@ -80,6 +80,7 @@ export default function App() {
       setSecretData("");
     } catch (err) {
       console.log(err);
+      setAccessToken("");
     }
   };
 
@@ -96,6 +97,7 @@ export default function App() {
       isSignUpSuccess = true;
 
     } catch (err) {
+      //error.response.data.message
       const { response: { data: { message: errorMessage } } } = err;
       isSignUpSuccess = false;
       message = errorMessage

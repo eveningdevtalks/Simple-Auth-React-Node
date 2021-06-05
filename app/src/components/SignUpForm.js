@@ -27,8 +27,6 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-
-
 export default function SignUpForm({ handleUserSignUp }) {
 
   const [userData, setUserData] = useState(INITIAL_SIGNUP_STATE);
