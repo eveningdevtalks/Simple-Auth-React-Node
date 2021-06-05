@@ -13,6 +13,9 @@ Server calls handling done with [axios](https://github.com/axios/axios)
 
 Create `.env` file using the `.env.example` file and update the `REACT_APP_API_URL` with server url.
 
+| Variable         | Default | Description               |
+|------------------|---------|---------------------------|
+| REACT_APP_API_URL| none    | node server url           |
 
 ---
 

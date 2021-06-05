@@ -1,7 +1,7 @@
 {
-  "name": "super-hero-zone-api",
+  "name": "simple-auth-api",
   "version": "1.0.0",
-  "description": "Super Hero Zone API",
+  "description": "Simple Auth API",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

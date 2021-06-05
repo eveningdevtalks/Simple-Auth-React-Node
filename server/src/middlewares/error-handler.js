@@ -14,7 +14,7 @@ exports.handleNotFound = (_req, res, _next) => {
 
 // handle errors
 exports.handleError = (err, _req, res, _next) => {
-  console.error(`Error occured`, err)
+  console.error(`Error occurred`, err)
 
   if (err instanceof ValidationError) {
     return res.status(httpStatus.BAD_REQUEST)

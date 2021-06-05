@@ -26,6 +26,6 @@ exports.start = () => {
       process.exit(-1);
     }
 
-    console.log(`SuperHeroZone is running on ${config.port}`);
+    console.log(`Simple Auth with Node.js is running on ${config.port}`);
   });
 };
