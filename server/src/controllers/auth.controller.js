@@ -115,7 +115,7 @@ exports.loginToken = async (req, res, next) => {
   }
 };
 
-exports.leaseToken = async (req, res, next) => {
+exports.renewRefreshToken = async (req, res, next) => {
   try {
     const { user } = req;
 
