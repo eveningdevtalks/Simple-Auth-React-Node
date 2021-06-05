@@ -28,8 +28,14 @@ Content-Type: application/json
 }
 ###
 
+### Logout
+POST http://localhost:4041/api/auth/logout HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer token
+###
+
 ### Lease refresh token lifetime
-POST http://localhost:4041/api/auth/token/lease HTTP/1.1
+POST http://localhost:4041/api/auth/token/refresh HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer token
 ###

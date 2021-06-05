@@ -11,6 +11,13 @@ exports.register = async (req, res, next) => {
   try {
     const { email, name, password } = req.body;
 
+    const existingAcc = await User.findOne({ email });
+    if (existingAcc) {
+      return res
+        .status(httpStatus.UNPROCESSABLE_ENTITY)
+        .json({ message: `Account already exists for ${email}` });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({ email, password: hashedPassword, name });
@@ -110,6 +117,18 @@ exports.loginToken = async (req, res, next) => {
     return res
       .status(httpStatus.OK)
       .json({ ...tokens, user: { name: user.name } });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.logout = async (req, res, next) => {
+  try {
+    const { user } = req;
+
+    await RefreshToken.deleteOne({ user: user._id });
+
+    return res.status(httpStatus.OK).json({ message: "Ok" });
   } catch (error) {
     next(error);
   }

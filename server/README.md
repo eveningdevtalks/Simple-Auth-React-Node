@@ -1,4 +1,4 @@
-# Super Hero Zone API :zap:
+# Simple Node JWT authentication
 
 This API is developed using NodeJS and MongoDB
 
